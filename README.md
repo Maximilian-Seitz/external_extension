@@ -9,7 +9,7 @@ fun Vector.scale(multiplier: Float) = when(this) {
 	is Vector1D -> this.scale(multiplier)
 	is Vector2D -> this.scale(multiplier)
 	is Vector3D -> this.scale(multiplier)
-	else -> throw NotImplementedError("Extension method implemented for ${this::class}.")
+	else -> throw NotImplementedError("Extension method not implemented for ${this::class}.")
 }
 
 fun Vector1D.scale(multiplier: Float): Vector = Vector1D(multiplier * length)

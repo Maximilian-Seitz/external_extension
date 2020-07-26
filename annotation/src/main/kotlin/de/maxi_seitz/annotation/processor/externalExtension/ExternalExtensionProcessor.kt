@@ -117,7 +117,7 @@ class ExternalExtensionProcessor : AbstractProcessor() {
 									|	${originalReceivers.joinToString("\n|\t") { originalReceiver ->
 											"is $originalReceiver -> $originalInvocation"
 										}}
-									|	else -> throw NotImplementedError("Extension method implemented for ${"$"}{this::class}.")
+									|	else -> throw NotImplementedError("Extension method not implemented for ${"$"}{this::class}.")
 									|}
 									""".trimMargin()
 								)
