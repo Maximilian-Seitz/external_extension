@@ -82,6 +82,12 @@ class ExternalExtensionProcessor : AbstractProcessor() {
 			val originalReceiver = annotatedFunction.extensionReceiver ?: err(EXTENSION_FUNCTIONS_ONLY_ERROR)
 			val parameters = annotatedFunction.extensionFunctionParameters
 			
+			val parentFunctionName = if (externalExtension.superName.isNotBlank()) {
+				externalExtension.superName
+			} else {
+				functionName
+			}
+			
 			val parameterNames = parameters.map {
 				it.simpleName.toString()
 			}
@@ -90,15 +96,15 @@ class ExternalExtensionProcessor : AbstractProcessor() {
 				@Suppress("DEPRECATION") it.asType().asTypeName()
 			}
 			
-			packages[targetPackage][functionName][targetReceiver, parameterNames, parameterTypes] += originalReceiver
+			packages[targetPackage][parentFunctionName][targetReceiver, parameterNames, parameterTypes][originalReceiver] = functionName
 		}
 		
 		val generatedFiles = mutableListOf<FileSpec>()
 		
 		packages.forEachFunctionName { targetPackage, functionName, functions ->
-			val file = FileSpec.builder(targetPackage, "GENERATED_$functionName").apply {
+			val file = FileSpec.builder(targetPackage, "GENERATED_EXTERNAL_EXTENSION_$functionName").apply {
 				functions.forEachReceiver { targetReceiver, parameterNames, parameterTypes, originalReceivers ->
-					val originalInvocation = "this.$functionName(${parameterNames.joinToString(", ")})"
+					val originalParameters = parameterNames.joinToString(", ")
 					
 					addFunction(
 							FunSpec.builder(functionName).apply {
@@ -114,8 +120,8 @@ class ExternalExtensionProcessor : AbstractProcessor() {
 								
 								addStatement("""
 									|return when(this) {
-									|	${originalReceivers.joinToString("\n|\t") { originalReceiver ->
-											"is $originalReceiver -> $originalInvocation"
+									|	${originalReceivers.entries.joinToString("\n|\t") { (originalReceiver, originalFunction) ->
+											"is $originalReceiver -> this.$originalFunction($originalParameters)"
 										}}
 									|	else -> throw NotImplementedError("Extension method not implemented for ${"$"}{this::class}.")
 									|}

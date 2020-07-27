@@ -35,3 +35,20 @@ fun Vector2D.scale(multiplier: Float): Vector = Vector2D(multiplier * x, multipl
 @ExternalExtension(Vector::class)
 fun Vector3D.scale(multiplier: Float): Vector = Vector3D(multiplier * x, multiplier * y, multiplier * z)
 ```
+
+
+## Alternate names
+
+If not all implementations have the same function name,
+an alternate name can be provided, like this:
+
+```kotlin
+@ExternalExtension(Vector::class, superName = "scale")
+fun Vector1D.multiply(multiplier: Float): Vector = Vector1D(multiplier * length)
+
+@ExternalExtension(Vector::class)
+fun Vector2D.scale(multiplier: Float): Vector = Vector2D(multiplier * x, multiplier * y)
+
+@ExternalExtension(Vector::class)
+fun Vector3D.scale(multiplier: Float): Vector = Vector3D(multiplier * x, multiplier * y, multiplier * z)
+```

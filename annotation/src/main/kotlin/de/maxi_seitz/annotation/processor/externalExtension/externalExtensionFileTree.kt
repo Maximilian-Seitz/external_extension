@@ -48,9 +48,9 @@ class ExternalExtensionFunctions {
 		}
 	}
 	
-	fun forEachReceiver(callback: (receiver: TypeName, parameterNames: List<String>, parameterTypes: List<TypeName>, childReceivers: Set<TypeMirror>) -> Unit) {
+	fun forEachReceiver(callback: (receiver: TypeName, parameterNames: List<String>, parameterTypes: List<TypeName>, childFunctions: Map<TypeMirror, String>) -> Unit) {
 		receivers.forEach { (signature, function) ->
-			callback(signature.receiver, function.parameterNames, signature.parameters, function.childReceivers.toSet())
+			callback(signature.receiver, function.parameterNames, signature.parameters, function.childFunctions.toMap())
 		}
 	}
 }
@@ -62,13 +62,13 @@ val ExternalExtensionFunctionSignature.parameters get() = second
 class ExternalExtensionFunction(
 		parameterNames: List<String>
 ) {
-	internal val childReceivers: MutableSet<TypeMirror> = mutableSetOf()
+	internal var childFunctions: MutableMap<TypeMirror, String> = mutableMapOf()
 	internal var useNames = true
 	
 	internal val parameterNames = parameterNames
 		get() = if (useNames) field else emptyList()
 	
-	operator fun plusAssign(receiver: TypeMirror) {
-		childReceivers.add(receiver)
+	operator fun set(receiver: TypeMirror, functionName: String) {
+		childFunctions[receiver] = functionName
 	}
 }
